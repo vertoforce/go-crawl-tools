@@ -20,7 +20,7 @@ type ProxyCrawlProxy struct {
 	// The amount of time to tell proxycrawl to wait to load the page (for javascript requests)
 	PageWait time.Duration
 
-	proxyCrawlClient *proxycrawl.Client
+	ProxyCrawlClient *proxycrawl.Client
 }
 
 // MakeRequest through proxycrawl.
@@ -29,7 +29,7 @@ type ProxyCrawlProxy struct {
 func (p *ProxyCrawlProxy) MakeRequest(ctx context.Context, req *http.Request) (html string, err error) {
 	for i := 0; i < p.TryCount; i++ { // Try this many times before giving up on this page
 		ctxProxyCrawl, cancel := context.WithTimeout(ctx, p.PageTimeout)
-		resp, err := p.proxyCrawlClient.MakeRequest(ctxProxyCrawl, &proxycrawl.RequestParameters{
+		resp, err := p.ProxyCrawlClient.MakeRequest(ctxProxyCrawl, &proxycrawl.RequestParameters{
 			URL:      req.URL.String(),
 			PageWait: p.PageWait.Milliseconds(),
 		}, proxycrawl.JavascriptRequest)
