@@ -12,7 +12,9 @@ import (
 type PageURLFunc func(page int64) string
 
 // CrawlPages Crawls all pages using the supplied parameters.
-// It starts at page 1, getting the total number of pages, then spawns multiple threads to call all the other pages
+// It starts at page 1, getting the total number of pages, then spawns multiple threads to crawl all the other pages.
+//
+// Each item it finds it sends to the returned channel.  If you know the type the ParseFunc returns, you can generatea a new channel type casting each item to that type.
 func CrawlPages(ctx context.Context, pageURLFunc PageURLFunc, parseFunction ParseFunc, totalPagesFunc TotalPagesFunc, p proxy.Proxy, maxThreads int) chan interface{} {
 	ret := make(chan interface{})
 

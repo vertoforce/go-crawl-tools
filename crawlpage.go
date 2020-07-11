@@ -7,7 +7,7 @@ import (
 	"github.com/vertoforce/go-crawl-tools/proxy"
 )
 
-// CrawlPage Crawls a single page and sends the resulting items to the channel
+// CrawlPage Crawls a single page, parsing out any generic items using the parseFunction, and sends the resulting items to the channel
 func CrawlPage(ctx context.Context, p proxy.Proxy, req *http.Request, itemsChannel chan interface{}, parseFunction ParseFunc) (html string, err error) {
 	html, err = p.MakeRequest(ctx, req)
 	if err != nil {
