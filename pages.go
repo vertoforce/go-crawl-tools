@@ -24,7 +24,7 @@ func CrawlPages(ctx context.Context, pageURLFunc PageURLFunc, parseFunction Pars
 		defer close(itemsChannel)
 		defer close(threadLimit)
 		// Crawl first page
-		req, err := http.NewRequest("GET", pageURLFunc(1), nil)
+		req, err := http.NewRequestWithContext(ctx, "GET", pageURLFunc(1), nil)
 		if err != nil {
 			return
 		}
@@ -39,6 +39,9 @@ func CrawlPages(ctx context.Context, pageURLFunc PageURLFunc, parseFunction Pars
 		for page := int64(2); page < pageCount; page++ {
 			select {
 			case <-ctx.Done():
+				// Wait for all our child threads to finish before returning
+				// and closing the channel they rely on
+				wg.Wait()
 				return
 			case threadLimit <- struct{}{}: // Try to consume a new thread
 			}
@@ -46,7 +49,7 @@ func CrawlPages(ctx context.Context, pageURLFunc PageURLFunc, parseFunction Pars
 			wg.Add(1)
 			go func(currentPage int64) {
 				// Build request
-				req, err := http.NewRequest("GET", pageURLFunc(currentPage), nil)
+				req, err := http.NewRequestWithContext(ctx, "GET", pageURLFunc(currentPage), nil)
 				if err != nil {
 					return
 				}
