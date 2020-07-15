@@ -48,6 +48,9 @@ func CrawlPages(ctx context.Context, pageURLFunc PageURLFunc, parseFunction Pars
 
 			wg.Add(1)
 			go func(currentPage int64) {
+				defer func() { <-threadLimit }() // Mark thread as done
+				defer wg.Done()
+
 				// Build request
 				req, err := http.NewRequestWithContext(ctx, "GET", pageURLFunc(currentPage), nil)
 				if err != nil {
@@ -55,9 +58,6 @@ func CrawlPages(ctx context.Context, pageURLFunc PageURLFunc, parseFunction Pars
 				}
 
 				_, _ = CrawlPage(ctx, p, req, itemsChannel, parseFunction)
-				// Mark thread as done
-				<-threadLimit
-				wg.Done()
 			}(page)
 		}
 
