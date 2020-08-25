@@ -36,7 +36,7 @@ func CrawlPages(ctx context.Context, pageURLFunc PageURLFunc, parseFunction Pars
 		pageCount := totalPagesFunc(ctx, html)
 
 		// Crawl all other pages
-		for page := int64(2); page < pageCount; page++ {
+		for page := int64(2); page <= pageCount; page++ {
 			select {
 			case <-ctx.Done():
 				// Wait for all our child threads to finish before returning
