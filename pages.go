@@ -75,5 +75,12 @@ func CrawlPages(ctx context.Context, pageURLFunc PageURLFunc, parseFunction Pars
 	// wait for all threads to be done
 	wg.Wait()
 
+	// Check if there is an error waiting for us
+	select {
+	case err := <-errors:
+		return err
+	default:
+	}
+
 	return nil
 }
